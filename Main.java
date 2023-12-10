@@ -10,39 +10,13 @@ import java.util.concurrent.TimeUnit;
 
 public class Main {
     public static void main(String[] args) {
-//        JFrame frame = new JFrame("Prosty interfejs graficzny");
-//        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-//        frame.setSize(400, 300);
-//
-//        // Ustalenie BorderLayout dla głównego kontenera
-//        frame.setLayout(new BorderLayout(0, 0)); // Ustawienie marginesów na 0
-//
-//        // Dodanie dwóch labeli na górze z odstępem 10 pikseli
-//        JPanel topPanel = new JPanel();
-//        topPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 10)); // Ustawienie odstępów
-//        JLabel label1 = new JLabel("Pierwszy Label");
-//        JLabel label2 = new JLabel("Drugi Label");
-//        topPanel.add(label1);
-//        topPanel.add(label2);
-//        frame.add(topPanel, BorderLayout.NORTH);
-//
-//        // Dodanie pola tekstowego na środku ekranu
-//        JTextField textField = new JTextField(20);
-//        textField.setHorizontalAlignment(JTextField.CENTER); // Wyśrodkowanie tekstu
-//        frame.add(textField, BorderLayout.CENTER);
-//
-//        // Dodanie przycisku na dole ekranu z odstępem 20 pikseli
-//        JButton button = new JButton("Dodaj tekst");
-//        JPanel bottomPanel = new JPanel();
-//        bottomPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 20, 20)); // Ustawienie odstępów
-//        bottomPanel.add(button);
-//        frame.add(bottomPanel, BorderLayout.SOUTH);
-//
-//        frame.setVisible(true);
 
 
+
+        ksiazka ksiazka1=new ksiazka();
         String stingip="";
         InetAddress localip;
+        int port = 4211;
         try {
             localip=InetAddress.getLocalHost();
         } catch (UnknownHostException e) {
@@ -73,9 +47,21 @@ public class Main {
         mid.add(area);
         mp.add(mid);
 
-        JPanel bot = new JPanel();
-        JButton b1 = new JButton("Modificate text");
+        JButton b1 = new JButton("get text");
+        b1.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                area.setText(ksiazka1.read());
+            }
+        });
         JButton b2 = new JButton("Save text");
+        b2.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                ksiazka1.write(area.getText());
+            }
+        });
         JPanel botpanel = new JPanel();
         botpanel.setLayout(new FlowLayout(FlowLayout.CENTER));
         botpanel.add(b1);
@@ -87,80 +73,26 @@ public class Main {
         frame.setVisible(true);
 
 
-        ExecutorService writter= Executors.newFixedThreadPool(2);
-        ExecutorService reader=Executors.newFixedThreadPool(2);
-        ksiazka ksiazka1=new ksiazka();
+        ExecutorService serwer=Executors.newCachedThreadPool();
+        serwer.submit(()->{
 
-//        int port=2234;
-//
-//        try {
-//            Socket s1=new Socket(ips,port);
-//
-//        } catch (IOException e) {
-//            throw new RuntimeException(e);
-//        }
+            try (ServerSocket ssocket=new ServerSocket(port)){
+                while (true){
+                    Socket socket=ssocket.accept();
+                    try (PrintWriter out=new PrintWriter(socket.getOutputStream(),true)){
+                        out.println(ksiazka1.read());
+                    }
+                    catch (IOException e){
+                        System.out.printf("serwer sending error");
+                    }
+                }
+            }
+            catch (IOException e){
+                System.out.printf("serwer error");
+            }
+            System.out.printf("connection close");
+            serwer.shutdown();
+        });
 
-
-//        writter.submit(() ->{
-//            while (true) {
-//                ksiazka1.write("a");
-//            }
-//        });
-//        reader.submit(()-> {
-//            while (true) {
-//                System.out.printf(ksiazka1.read());
-//                System.out.printf("\n");
-//            }
-//        });
-
-//        try {
-//            reader.awaitTermination(10, TimeUnit.SECONDS);
-//        } catch (InterruptedException e) {
-//            throw new RuntimeException(e);
-//        }
-//
-//        try {
-//            writter.awaitTermination(10,TimeUnit.SECONDS);
-//        } catch (InterruptedException e) {
-//            throw new RuntimeException(e);
-//        }
-//
-//        writter.shutdown();
-//        reader.shutdown();
     }
 }
-//public class Main {
-//    public static void main(String[] args) {
-//        Test test = new Test();
-//        ExecutorService executor = Executors.newFixedThreadPool(2);
-//
-//        executor.execute(() -> {
-//            for (int i = 0; i < 10; i++) {
-//                test.aaa();
-//            }
-//        });
-//
-//        executor.submit(() -> {
-//            for (int i = 0; i < 10; i++) {
-//                test.bbb();
-//            }
-//        });
-//
-//        executor.shutdown();
-//    }
-//}
-//
-//class Test {
-//    public synchronized void aaa() {
-//        try {
-//            Thread.sleep(1000);
-//        } catch (InterruptedException e) {
-//            throw new RuntimeException(e);
-//        }
-//        System.out.println("Funkcja aaa() została wywołana.");
-//    }
-//
-//    public synchronized void bbb() {
-//        System.out.println("Funkcja bbb() została wywołana.");
-//    }
-//}
