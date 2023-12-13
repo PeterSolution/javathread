@@ -1,6 +1,10 @@
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.InetAddress;
+import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.concurrent.ExecutorService;
@@ -14,6 +18,7 @@ public class Main {
 
 
         ksiazka ksiazka1=new ksiazka();
+        status stat=new status();
         String stingip="";
         InetAddress localip;
         int port = 4211;
@@ -48,18 +53,38 @@ public class Main {
         mp.add(mid);
 
         JButton b1 = new JButton("get text");
+
+        ExecutorService settextksiazka=Executors.newCachedThreadPool();
+        ExecutorService gettextksiazka=Executors.newCachedThreadPool();
+
+
+
         b1.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                stat.setStatus("write");
+                gettextksiazka.submit(()->{
+                    area.setText(ksiazka1.read());
+                    stat.setStatus("free");
+                });
+                while (stat.getStatus()!="free"){
+                    gettextksiazka.shutdown();
+                }
 
-                area.setText(ksiazka1.read());
             }
         });
         JButton b2 = new JButton("Save text");
         b2.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                ksiazka1.write(area.getText());
+                stat.setStatus("Czyta");
+                settextksiazka.submit(()->{
+                    ksiazka1.write(area.getText());
+                    stat.setStatus("free");
+                });
+                while (stat.getStatus()!="free"){
+                    settextksiazka.shutdown();
+                }
             }
         });
         JPanel botpanel = new JPanel();
