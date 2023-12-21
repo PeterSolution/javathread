@@ -5,14 +5,12 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.ServerSocket;
+import java.util.concurrent.*;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import javax.swing.*;
-import java.util.concurrent.TimeUnit;
 
-public class Main {
+public class Main{
     public static void main(String[] args) {
 
 
@@ -42,7 +40,13 @@ public class Main {
         JLabel label = new JLabel("IP to: ");
         top.add(label);
         JLabel labelip = new JLabel(ips);
+        JLabel statt=new JLabel("Status Ksiażki: "+stat.getStatus());
+        JLabel czytell=new JLabel("Czytelnoków: 0");
+        JLabel pisarzyy=new JLabel("Pisarzy: 0");
         top.add(labelip);
+        top.add(statt);
+        top.add(czytell);
+        top.add(pisarzyy);
         mp.add(top);
 
         JPanel mid=new JPanel();
@@ -58,33 +62,49 @@ public class Main {
         ExecutorService gettextksiazka=Executors.newCachedThreadPool();
 
 
+        ExecutorService exes2=Executors.newCachedThreadPool();
 
         b1.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                stat.setStatus("write");
-                gettextksiazka.submit(()->{
-                    area.setText(ksiazka1.read());
-                    stat.setStatus("free");
-                });
-                while (stat.getStatus()!="free"){
-                    gettextksiazka.shutdown();
-                }
+                exes2.submit(()->{
+                    if(stat.getStatus()=="free") {
 
+                            stat.setStatus("pisarz pisze");
+                            pisarzyy.setText("pisarzy: "+ksiazka1.getIloscpisarzy());
+                            area.setText(ksiazka1.read());
+                            stat.setStatus("free");
+                            pisarzyy.setText("pisarzy: "+ksiazka1.getIloscpisarzy());
+
+                    }
+                    else{
+                        statt.setText("Status Ksiażki: "+stat.getStatus());
+                    }
+                });
             }
         });
         JButton b2 = new JButton("Save text");
+        ExecutorService exes1=Executors.newCachedThreadPool();
         b2.addActionListener(new ActionListener() {
+
             @Override
             public void actionPerformed(ActionEvent e) {
-                stat.setStatus("Czyta");
-                settextksiazka.submit(()->{
-                    ksiazka1.write(area.getText());
-                    stat.setStatus("free");
+                exes1.submit(() -> {
+
+                    if (stat.getStatus() == "free") {
+
+                            stat.setStatus("Czyta");
+                            czytell.setText("Czytelników "+ksiazka1.getIloscczytelnikow());
+                            ksiazka1.write(area.getText());
+                            stat.setStatus("free");
+                            czytell.setText("Czytelników "+ksiazka1.getIloscczytelnikow());
+
+
+                    } else {
+                        statt.setText("Status Ksiażki: " + stat.getStatus());
+                    }
+
                 });
-                while (stat.getStatus()!="free"){
-                    settextksiazka.shutdown();
-                }
             }
         });
         JPanel botpanel = new JPanel();
@@ -97,6 +117,10 @@ public class Main {
         frame.pack();
         frame.setVisible(true);
 
+        ExecutorService wypisstatusu=Executors.newCachedThreadPool();
+        wypisstatusu.submit(()->{
+            pisarzyy.setText("pisarzy: "+ksiazka1.getPisarze());
+        });
 
         ExecutorService serwer=Executors.newCachedThreadPool();
         serwer.submit(()->{
@@ -120,4 +144,6 @@ public class Main {
         });
 
     }
+
+
 }

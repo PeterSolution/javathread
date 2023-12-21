@@ -1,10 +1,5 @@
 public class status {
-    String status;
-    public status(){
-        this.status="free";
-    }
-
-
+    String status="free";
     public String getStatus() {
         return status;
     }
