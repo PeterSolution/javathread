@@ -68,17 +68,21 @@ public class Main{
             @Override
             public void actionPerformed(ActionEvent e) {
                 exes2.submit(()->{
-                    if(stat.getStatus()=="free") {
+                    if(ksiazka1.iloscpisarzy==0) {
+                        if (stat.getStatus() == "free") {
 
                             stat.setStatus("pisarz pisze");
-                            pisarzyy.setText("pisarzy: "+ksiazka1.getIloscpisarzy());
+                            pisarzyy.setText("pisarzy: " + ksiazka1.getIloscpisarzy());
                             area.setText(ksiazka1.read());
                             stat.setStatus("free");
-                            pisarzyy.setText("pisarzy: "+ksiazka1.getIloscpisarzy());
+                            pisarzyy.setText("pisarzy: " + ksiazka1.getIloscpisarzy());
 
+                        } else {
+                            statt.setText("Status Ksiażki: " + stat.getStatus());
+                        }
                     }
                     else{
-                        statt.setText("Status Ksiażki: "+stat.getStatus());
+
                     }
                 });
             }
@@ -90,20 +94,40 @@ public class Main{
             @Override
             public void actionPerformed(ActionEvent e) {
                 exes1.submit(() -> {
+                    if(ksiazka1.getIloscpisarzy()==0) {
 
-                    if (stat.getStatus() == "free") {
+                        if (stat.getStatus() == "free") {
 
                             stat.setStatus("Czyta");
-                            czytell.setText("Czytelników "+ksiazka1.getIloscczytelnikow());
+                            czytell.setText("Czytelników " + ksiazka1.getIloscczytelnikow());
                             ksiazka1.write(area.getText());
                             stat.setStatus("free");
-                            czytell.setText("Czytelników "+ksiazka1.getIloscczytelnikow());
+                            czytell.setText("Czytelników " + ksiazka1.getIloscczytelnikow());
 
 
-                    } else {
-                        statt.setText("Status Ksiażki: " + stat.getStatus());
+                        } else {
+                            statt.setText("Status Ksiażki: " + stat.getStatus());
+                        }
                     }
+                    else{
+                        int pomocnicza;
+                        pomocnicza=ksiazka1.getPisarze()+1;
+                        while (!(ksiazka1.getPisarze()==pomocnicza)){
 
+                        }
+                        if (stat.getStatus() == "free") {
+
+                            stat.setStatus("Czyta");
+                            czytell.setText("Czytelników " + ksiazka1.getIloscczytelnikow());
+                            ksiazka1.write(area.getText());
+                            stat.setStatus("free");
+                            czytell.setText("Czytelników " + ksiazka1.getIloscczytelnikow());
+
+
+                        } else {
+                            statt.setText("Status Ksiażki: " + stat.getStatus());
+                        }
+                    }
                 });
             }
         });
@@ -124,7 +148,6 @@ public class Main{
 
         ExecutorService serwer=Executors.newCachedThreadPool();
         serwer.submit(()->{
-
             try (ServerSocket ssocket=new ServerSocket(port)){
                 while (true){
                     Socket socket=ssocket.accept();

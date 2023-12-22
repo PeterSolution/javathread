@@ -38,7 +38,7 @@ public class ksiazka /*implements Runnable*/{
         iloscczytelnikow=iloscczytelnikow+1;
         czytelnicy=czytelnicy+1;
         //synchronized (lock) {
-        if(kolejkaczytelnikow>0&&!(pisze==1)||(pisarze==0&&kolejkaczytelnikow==0)){
+        if((kolejkaczytelnikow>0&&!(pisze==1))||(pisarze==0&&kolejkaczytelnikow==0)){
             if (kolejkaczytelnikow > 0) {
                 this.kolejkaczytelnikow=this.kolejkaczytelnikow-1;
 
@@ -47,13 +47,10 @@ public class ksiazka /*implements Runnable*/{
             return txt;
         }
         else {
-            while (kolejkaczytelnikow==0){
+            while (pisze==1){
 
             }
-            if(kolejkaczytelnikow>0){
-                this.kolejkaczytelnikow=this.kolejkaczytelnikow-1;
-
-            }
+            this.kolejkaczytelnikow=this.kolejkaczytelnikow-1;
             iloscczytelnikow=iloscczytelnikow-1;
             return txt;
         }
