@@ -8,11 +8,11 @@ import java.net.ServerSocket;
 import java.util.concurrent.*;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.concurrent.atomic.AtomicInteger;
 import javax.swing.*;
 
 public class Main{
     public static void main(String[] args) {
-
 
 
         ksiazka ksiazka1=new ksiazka();
@@ -62,6 +62,7 @@ public class Main{
         ExecutorService gettextksiazka=Executors.newCachedThreadPool();
 
 
+        AtomicInteger idnumber= new AtomicInteger();
         ExecutorService exes2=Executors.newCachedThreadPool();
 
         b1.addActionListener(new ActionListener() {
@@ -94,13 +95,13 @@ public class Main{
             @Override
             public void actionPerformed(ActionEvent e) {
                 exes1.submit(() -> {
-                    if(ksiazka1.getIloscpisarzy()==0) {
+                    if(ksiazka1.getKolejkapisarzy()==0) {
 
                         if (stat.getStatus() == "free") {
 
                             stat.setStatus("Czyta");
                             czytell.setText("Czytelników " + ksiazka1.getIloscczytelnikow());
-                            ksiazka1.write(area.getText());
+                            ksiazka1.write(area.getText(), idnumber.get());
                             stat.setStatus("free");
                             czytell.setText("Czytelników " + ksiazka1.getIloscczytelnikow());
 
@@ -110,24 +111,21 @@ public class Main{
                         }
                     }
                     else{
-                        int pomocnicza;
-                        pomocnicza=ksiazka1.getPisarze()+1;
-                        while (!(ksiazka1.getPisarze()==pomocnicza)){
 
-                        }
                         if (stat.getStatus() == "free") {
 
                             stat.setStatus("Czyta");
-                            czytell.setText("Czytelników " + ksiazka1.getIloscczytelnikow());
-                            ksiazka1.write(area.getText());
+                            czytell.setText("Czytelników " + ksiazka1.getLiczbaczytelnikow());
+                            ksiazka1.write(area.getText(), idnumber.get());
                             stat.setStatus("free");
-                            czytell.setText("Czytelników " + ksiazka1.getIloscczytelnikow());
+                            czytell.setText("Czytelników " + ksiazka1.getLiczbaczytelnikow());
 
 
                         } else {
                             statt.setText("Status Ksiażki: " + stat.getStatus());
                         }
                     }
+                    idnumber.getAndIncrement();
                 });
             }
         });
@@ -143,7 +141,7 @@ public class Main{
 
         ExecutorService wypisstatusu=Executors.newCachedThreadPool();
         wypisstatusu.submit(()->{
-            pisarzyy.setText("pisarzy: "+ksiazka1.getPisarze());
+            pisarzyy.setText("pisarzy: "+ksiazka1.getKolejkapisarzy());
         });
 
         ExecutorService serwer=Executors.newCachedThreadPool();
